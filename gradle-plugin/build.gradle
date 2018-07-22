@@ -1,0 +1,20 @@
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'maven-publish'
+apply plugin: 'groovy'
+
+sourceCompatibility = 1.6
+
+dependencies {
+    compileOnly gradleApi()
+    implementation 'com.squareup:javapoet:1.10.0'
+    implementation 'com.github.javaparser:javaparser-core:3.5.14'
+}
+
+group 'com.dhabensky'
+version '0.1.1'
+
+publishing {
+    publications {
+        archivesBaseName = rootProject.name
+    }
+}
