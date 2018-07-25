@@ -7,76 +7,76 @@ import org.gradle.api.tasks.Copy
 
 class IndexPlugin implements Plugin<Project> {
 
-    private static String GENERATED_A_DIR = "generated/source/a"
+	private static String GENERATED_A_DIR = "generated/source/a"
 
-    void apply(Project project) {
+	void apply(Project project) {
 
-        // Add the extension object
-        def extension = project.extensions.create('assets', IndexExtension)
+		// Add the extension object
+		def extension = project.extensions.create('assets', IndexExtension)
 
-        createTaskCopyAssets(project, extension)
-        createTaskGenerateA(project, extension)
+		createTaskCopyAssets(project, extension)
+		createTaskGenerateA(project, extension)
 
-        project.afterEvaluate {
-            project.configure(project) {
-                generateA.dependsOn copyAssets
-                compileJava.dependsOn generateA
+		project.afterEvaluate {
+			project.configure(project) {
+				generateA.dependsOn copyAssets
+				compileJava.dependsOn generateA
 
-                compileJava.source project.file("${project.buildDir}/$GENERATED_A_DIR")
-            }
-        }
-    }
+				project.sourceSets*.java*.srcDir project.file("${project.buildDir}/$GENERATED_A_DIR")
+			}
+		}
+	}
 
-    private static void createTaskCopyAssets(Project project, IndexExtension extension) {
+	private static void createTaskCopyAssets(Project project, IndexExtension extension) {
 
-        Copy copyAssets = project.task('copyAssets', type: Copy)
+		Copy copyAssets = project.task('copyAssets', type: Copy)
 
-        project.afterEvaluate {
+		project.afterEvaluate {
 
-            resolvePaths(project, extension)
+			resolvePaths(project, extension)
 
-            copyAssets.configure {
-                doFirst {
-                    println "packaging: ${extension.srcAssets} -> ${extension.genAssets}"
-                }
-                from(extension.srcAssets)
-                into(extension.genAssets)
-            }
-        }
-    }
+			copyAssets.configure {
+				doFirst {
+					println "packaging: ${extension.srcAssets} -> ${extension.genAssets}"
+				}
+				from(extension.srcAssets)
+				into(extension.genAssets)
+			}
+		}
+	}
 
-    private static void createTaskGenerateA(Project project, IndexExtension extension) {
+	private static void createTaskGenerateA(Project project, IndexExtension extension) {
 
-        Task generateA = project.task('generateA')
+		Task generateA = project.task('generateA')
 
-        project.afterEvaluate {
+		project.afterEvaluate {
 
-            def assetDir = project.file(extension.genAssets)
-            def generatedDir = project.file("${project.buildDir}/$GENERATED_A_DIR")
-            def packageName = extension.packageName
+			def assetDir = project.file(extension.genAssets)
+			def generatedDir = project.file("${project.buildDir}/$GENERATED_A_DIR")
+			def packageName = extension.packageName
 
-            generateA.configure {
-                inputs.dir(assetDir)
-                outputs.dir(generatedDir)
-                doLast {
-                    new IndexBuilder(assetDir, generatedDir, packageName, 'A').build()
-                }
-            }
-        }
-    }
+			generateA.configure {
+				inputs.dir(assetDir)
+				outputs.dir(generatedDir)
+				doLast {
+					new IndexBuilder(assetDir, generatedDir, packageName, 'A').build()
+				}
+			}
+		}
+	}
 
-    private static void resolvePaths(Project project, IndexExtension extension) {
-        if (extension.srcAssets == null)
-            extension.srcAssets = "${project.file('assets')}"
-        if (extension.genAssets == null)
-            extension.genAssets = "${project.buildDir}/generated/assets"
-    }
+	private static void resolvePaths(Project project, IndexExtension extension) {
+		if (extension.srcAssets == null)
+			extension.srcAssets = "${project.file('assets')}"
+		if (extension.genAssets == null)
+			extension.genAssets = "${project.buildDir}/generated/assets"
+	}
 
 }
 
 
 class IndexExtension {
-    String srcAssets = null
-    String genAssets = null
-    String packageName = ""
+	String srcAssets = null
+	String genAssets = null
+	String packageName = ""
 }

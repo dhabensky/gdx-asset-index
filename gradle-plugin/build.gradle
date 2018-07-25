@@ -10,11 +10,14 @@ dependencies {
     implementation 'com.github.javaparser:javaparser-core:3.5.14'
 }
 
-group 'com.dhabensky'
-version '0.1.1'
 
 publishing {
     publications {
-        archivesBaseName = rootProject.name
+		gdxAssetIndex (MavenPublication) {
+			from components.java
+			groupId 'com.dhabensky'
+			artifactId rootProject.name
+			version '0.1.1'
+		}
     }
 }
